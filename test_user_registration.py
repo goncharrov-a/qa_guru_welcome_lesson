@@ -40,3 +40,5 @@ def test_user_registration():
     assert driver.find_element(
         By.XPATH, '//*[text() = " Your Account Has Been Created!"]'
     )
+
+    driver.quit()
