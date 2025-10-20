@@ -1,44 +1,41 @@
 import os
+import random
 import time
 
+import pytest
 from dotenv import load_dotenv
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-import random
+
+from registration_page import RegistrationPage
+from registration_page import User
 
 load_dotenv()
 
 base_url = os.getenv("BASE_URL")
 
 
-def test_user_registration():
+@pytest.fixture
+def driver_chrome():
     driver = webdriver.Chrome()
     driver.get(base_url)
-
-    unique = str(int(time.time())) + str(random.randint(100, 999))
-    first_name = "Ivan"
-    last_name = "Petrov"
-    email = f'test{unique}{unique}@mail.ru'
-    phone_number = "+79993338811"
-    password = "random_pass"
-
-    driver.find_element(By.ID, "input-firstname").send_keys(first_name)
-    driver.find_element(By.ID, "input-lastname").send_keys(last_name)
-    driver.find_element(By.ID, "input-email").send_keys(email)
-    driver.find_element(By.ID, "input-telephone").send_keys(phone_number)
-    driver.find_element(By.ID, "input-password").send_keys(password)
-    driver.find_element(By.ID, "input-confirm").send_keys(password)
-    driver.find_element(By.ID, "input-agree")
-
-    checkbox = driver.find_element(By.ID, "input-agree")
-    driver.execute_script("arguments[0].click();", checkbox)
-
-    driver.find_element(By.CSS_SELECTOR, '[value="Continue"]').click()
-
-    time.sleep(1)
-    assert driver.find_element(By.ID, "content")
-    assert driver.find_element(
-        By.XPATH, '//*[text() = " Your Account Has Been Created!"]'
-    )
-
+    yield driver
     driver.quit()
+
+
+@pytest.fixture
+def unique_user():
+    unique_data = str(int(time.time())) + str(random.randint(100, 999))
+    user: User = User(unique_data)
+    yield user
+
+
+@pytest.fixture
+def registration_page(driver_chrome):
+    yield RegistrationPage(driver_chrome)
+
+
+def test_user_registration_pom(registration_page, unique_user):
+    registration_page.check_form_is_visible()
+    registration_page.fill_registration_form(unique_user)
+    registration_page.check_form_is_not_visible()
+    registration_page.check_that_success_form_is_visible()
