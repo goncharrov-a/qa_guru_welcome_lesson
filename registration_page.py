@@ -47,6 +47,19 @@ class RegistrationPage(BasePage):
     CONTENT = (By.ID, "content")
     TEXT_ASSERT = (By.XPATH, '//h1[text() = " Your Account Has Been Created!"]')
 
+    def click_continue_button(self):
+        self.click(self.CONTINUE_BUTTON)
+
+    def fill_registration_form(self, user: User):
+        self.fill(self.FIRST_NAME, user.first_name)
+        self.fill(self.LAST_NAME, user.last_name)
+        self.fill(self.EMAIL, user.email)
+        self.fill(self.PHONE, user.phone_number)
+        self.fill(self.PASSWORD, user.password)
+        self.fill(self.CONFIRM_PASSWORD, user.password)
+        self.click(self.POLICY_AGREEMENT, force=True)
+        self.click_continue_button()
+
     def check_form_is_visible(self):
         assert self.find_element(self.FIRST_NAME)
         assert self.find_element(self.LAST_NAME)
@@ -67,16 +80,10 @@ class RegistrationPage(BasePage):
         assert self.not_find_element(self.POLICY_AGREEMENT)
         assert self.not_find_element(self.CONTINUE_BUTTON)
 
-    def fill_registration_form(self, user: User):
-        self.fill(self.FIRST_NAME, user.first_name)
-        self.fill(self.LAST_NAME, user.last_name)
-        self.fill(self.EMAIL, user.email)
-        self.fill(self.PHONE, user.phone_number)
-        self.fill(self.PASSWORD, user.password)
-        self.fill(self.CONFIRM_PASSWORD, user.password)
-        self.click(self.POLICY_AGREEMENT, force=True)
-        self.click(self.CONTINUE_BUTTON)
-
     def check_that_success_form_is_visible(self):
         assert self.find_element(self.CONTENT)
         assert self.find_element(self.TEXT_ASSERT)
+
+    def check_that_success_form_is_not_visible(self):
+        assert self.not_find_element(self.CONTENT)
+        assert self.not_find_element(self.TEXT_ASSERT)
