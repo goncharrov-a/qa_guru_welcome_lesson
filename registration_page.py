@@ -1,6 +1,6 @@
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 
 class BasePage:
@@ -15,11 +15,11 @@ class BasePage:
         return self.wait.until_not(EC.presence_of_element_located(selector))
 
     def click(self, selector, force=False):
-        element = self.wait.until(EC.element_to_be_clickable(selector))
+        element = self.wait.until(EC.presence_of_element_located(selector))
         if force:
-            element.click()
-        else:
             self.driver.execute_script("arguments[0].click();", element)
+        else:
+            element.click()
 
     def fill(self, selector, value):
         element = self.find_element(selector)
@@ -45,7 +45,7 @@ class RegistrationPage(BasePage):
     POLICY_AGREEMENT = (By.ID, "input-agree")
     CONTINUE_BUTTON = (By.CSS_SELECTOR, '[value="Continue"]')
     CONTENT = (By.ID, "content")
-    TEXT_ASSERT = (By.XPATH, '//*[text() = " Your Account Has Been Created!"]')
+    TEXT_ASSERT = (By.XPATH, '//h1[text() = " Your Account Has Been Created!"]')
 
     def check_form_is_visible(self):
         assert self.find_element(self.FIRST_NAME)
@@ -80,5 +80,3 @@ class RegistrationPage(BasePage):
     def check_that_success_form_is_visible(self):
         assert self.find_element(self.CONTENT)
         assert self.find_element(self.TEXT_ASSERT)
-
-
